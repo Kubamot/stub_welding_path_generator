@@ -1,0 +1,1 @@
+# stub_welding_path_generator
