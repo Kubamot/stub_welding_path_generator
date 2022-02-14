@@ -212,8 +212,7 @@ class Pipe(PipeInit):
         """
         self.XYZ_matrix = np.roll(self.position_matrix, -shift, axis=0)
 
-    def \
-            vec_tangent(self, i):
+    def vec_tangent(self, i):
         """
         Return vector tangent to path
         :param i: item of path
