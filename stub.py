@@ -5,6 +5,9 @@ from scipy import interpolate
 from utils import unit_vector
 from utils import angle_between_vectors
 from utils import vectors_bisector
+from untls import project_vector_to_plane
+from utils import plane_normal_to_vector
+
 from utils import Point
 
 
@@ -60,19 +63,23 @@ class Stub():
     def count_rot(self):
         path_data = [point.pose for point in self._path_points]
 
-        leading_vector = get_leading_vectors(path_data)
-        torch_ax_vectors = get_torch_ax_vectors(path_data)
-
-    def get_torch_ax_vectors(self, path_data):
+        leading_vector = _get_leading_vectors(path_data)
         torch_ax_vectors = []
-        for vector in path_data:
-            horizontal_vector = np.array([0, 0, 1])
-            vector_tangled_to_pipe = _get_vector_tangled_to_YZ_pipe_crossection(
-                vector)
-            torch_ax_vectors.append(unit_vector(vectors_bisector(
-                vector_tangled_to_pipe, horizontal_vector)))
+        for i, vector in enumerate(path_data):
+            troch_ax_raw_vector = self._get_torch_ax_vector(vector)
+            plane_normal_to_leading_vector = plane_normal_to_vector(
+                leading_vector[i])
+            torch_ax_vectors.append(project_vector_to_plane(
+                troch_ax_raw_vector, plane_normal_to_leading_vector))
+            
 
-        return torch_ax_vectors
+    def __get_torch_ax_vector(self, vector):
+
+        horizontal_vector = np.array([0, 0, 1])
+        vector_tangled_to_pipe = _get_vector_tangled_to_YZ_pipe_crossection(
+            vector)
+
+        return unit_vector(vectors_bisector(vector_tangled_to_pipe, horizontal_vector))
 
     def _get_vector_tangled_to_YZ_pipe_crossection(self, vector):
 
@@ -99,7 +106,7 @@ class Stub():
         vector_on_XY = unit_vector(vector)[0:2]
         return angle_between_vectors(vertical_vector, vector_on_XY)
 
-    def get_leading_vectors(self, path_data):
+    def _get_leading_vectors(self, path_data):
 
         vectors_heads = np.array(path_data)
         path_data.insert(0, path_data.pop())
@@ -110,12 +117,12 @@ class Stub():
         np.insert(path_vectors, 0, path_vectors[-1])
         np.append(path_vectors, path_vectors[1])
 
-        leading_vecotrs = []
+        leading_vectors = []
 
         for i in range(1, len(path_vectors)):
             norm_vec_from_last_point = unit_vector(path_vectors[i-1])
             norm_vec_to_next_point = unit_vector(path_vectors[i])
             leading_vector = np.divide(
                 norm_vec_from_last_point + norm_vec_to_next_point, 2)
-            leading_vecotrs.append(unit_vector(leading_vector))
-        return leading_vecotrs
+            leading_vectors.append(unit_vector(leading_vector))
+        return leading_vectors

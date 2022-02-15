@@ -44,3 +44,27 @@ def vectors_bisector(vector_1, vector_2):
     vector_1 = unit_vector(vector_1)
     vector_2 = unit_vector(vector_2)
     return unit_vector(np.sum(vector_1, vector_2))
+
+def project_vector_to_plane(vector, plane):
+    plane = perpendicular_plane(ax1)
+    w = np.linalg.inv(plane.T @ plane) @ plane.T @ vector
+    return unit_vector(plane @ w)
+
+def plane_normal_to_vector(vec):
+
+    t1 = np.random.rand(3, 1)
+    t2 = np.random.rand(3, 1)
+
+    # Making vector perpendicular to Vector vec
+    if vec[2] != 0:
+        t1[2] = -(vec[0] * t1[0] + vec[1] * t1[1]) / vec[2]
+        t2[2] = -(vec[0] * t2[0] + vec[1] * t2[1]) / vec[2]
+    elif vec[1] != 0:
+        t1[1] = -(vec[0] * t1[0] + vec[2] * t1[2]) / vec[1]
+        t2[1] = -(vec[0] * t2[0] + vec[2] * t2[2]) / vec[1]
+    else:
+        t1[0] = -(vec[2] * t1[2] + vec[1] * t1[1]) / vec[0]
+        t2[0] = -(vec[2] * t2[2] + vec[1] * t2[1]) / vec[0]
+
+    # Matrix witch have to vector which create 2D plane i 3D
+    return np.concatenate((t1, t2), axis=1)
