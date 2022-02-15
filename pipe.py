@@ -14,4 +14,7 @@ class Pipe():
     def print_path_points(self):
         for stub in self._stubs:
             stub.create_path_points(self._radius)
-            stub.print_path()
+            stub.count_rot()
+
+
+    
